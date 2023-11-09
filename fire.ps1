@@ -4,7 +4,8 @@ $width = $Host.UI.RawUI.WindowSize.Width
 $height = $Host.UI.RawUI.WindowSize.Height
 $bottomRow = $height - 1
 
-If (($args[0] -le 8) -and ($args[0] -gt 0)) {
+$oldTemp = 0
+If (($args[0] -le 7) -and ($args[0] -ge 0)) {
 	$temp = $args[0]
 } Else {
 	$temp = 7
@@ -29,20 +30,20 @@ $stateDoubleBuffer = New-Object int[] ($width * $height)
 $j = $height * $width
 $i = $j - $width
 While ($i -lt $j) {
-    $state[$i] = $temp
-    $i++
+	$state[$i] = $temp
+	$i++
 }
 
 $j = $height - 1
 $y = 0
 While ($y -lt $j) {
-    $x = 0
-    While ($x -lt $width) {
-        $i = $y * $width + $x
-        $state[$i] = 0
-        $x++
-    }
-    $y++
+	$x = 0
+	While ($x -lt $width) {
+		$i = $y * $width + $x
+		$state[$i] = 0
+		$x++
+	}
+	$y++
 }
 
 
@@ -51,8 +52,8 @@ While ($y -lt $j) {
 $x = 0
 Write-Host -NoNewline "`e[${height};0H"
 While ($x -lt $width) {
-    Write-Host -NoNewline $pallet[$temp]
-    $x++
+	Write-Host -NoNewline $pallet[$temp]
+	$x++
 }
 
 # run
@@ -85,8 +86,8 @@ Try {
 					If ($stateDoubleBuffer[$i] -ne $state[$i]) {
 						$yAnsiOffset = $y + 1
 						$xAnsiOffset = $x + 1
-						$frame = "${frame}`e[${yAnsiOffset};${xAnsiOffset}H"
-						$frame = "${frame}$($pallet[$state[$i]])"
+						$frame += "`e[${yAnsiOffset};${xAnsiOffset}H"
+						$frame += "$($pallet[$state[$i]])"
 					}
 				}
 
@@ -104,7 +105,7 @@ Try {
 		# approximate target FPS
 	    $frameDrawTime = [Math]::Round(($thisFrameDrawn - $lastFrameDrawn).TotalMilliseconds, 0)
 	    Write-Host "`e[1;1H`e[38;5;106m${frameDrawTime}ms  "
-	    
+
 	    $lastFrameDrawn = $thisFrameDrawn
 	    $sleepTime = 100 - $frameDrawTime
 	    If ($sleepTime -gt 0) {
